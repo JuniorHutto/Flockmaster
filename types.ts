@@ -3,7 +3,7 @@ export const Gender = {
   Ewe: 'Ewe',
   Wether: 'Wether'
 } as const;
-export type Gender = typeof Gender[keyof typeof Gender];
+export type Gender = 'Ram' | 'Ewe' | 'Wether';
 
 export const Status = {
   Active: 'Active',
@@ -11,7 +11,9 @@ export const Status = {
   Deceased: 'Deceased',
   Culled: 'Culled'
 } as const;
-export type Status = typeof Status[keyof typeof Status];
+export type Status = 'Active' | 'Sold' | 'Deceased' | 'Culled';
+
+export type HealthEventType = 'Vaccination' | 'Deworming' | 'Injury' | 'Hoof Trim' | 'Lambing' | 'Other';
 
 export interface WeightRecord {
   id: string;
@@ -23,20 +25,20 @@ export interface WeightRecord {
 export interface HealthRecord {
   id: string;
   date: string;
-  type: 'Vaccination' | 'Deworming' | 'Injury' | 'Hoof Trim' | 'Lambing' | 'Other';
+  type: HealthEventType;
   description: string;
   cost?: number;
 }
 
 export interface Sheep {
   id: string;
-  tagId: string; // The visible ear tag
+  tagId: string;
   name?: string;
-  breed: string; // Defaults to Katahdin based on context
+  breed: string;
   gender: Gender;
   dob: string;
-  sireId?: string; // ID of father
-  damId?: string; // ID of mother
+  sireId?: string;
+  damId?: string;
   status: Status;
   color?: string;
   weights: WeightRecord[];
@@ -48,5 +50,5 @@ export type ViewState =
   | { view: 'DASHBOARD' }
   | { view: 'LIST' }
   | { view: 'ADD' }
-  | { view: 'EDIT'; sheepId: string }
-  | { view: 'DETAIL'; sheepId: string };
+  | { view: 'EDIT'; sheepId: string; }
+  | { view: 'DETAIL'; sheepId: string; };

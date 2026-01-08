@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sheep, WeightRecord, HealthRecord, Gender } from '../types';
+import { Sheep, WeightRecord, HealthRecord, Gender, HealthEventType } from '../types';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { ArrowLeft, Edit2, Scale, Syringe, Save, Trash2, Calendar, Droplet, Activity } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
   const [newWeight, setNewWeight] = useState('');
   const [newWeightDate, setNewWeightDate] = useState(new Date().toISOString().split('T')[0]);
   
-  const [newHealthType, setNewHealthType] = useState<HealthRecord['type']>('Vaccination');
+  const [newHealthType, setNewHealthType] = useState<HealthEventType>('Vaccination');
   const [newHealthDesc, setNewHealthDesc] = useState('');
   const [newHealthDate, setNewHealthDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -218,7 +218,7 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
               />
               <select 
                 value={newHealthType}
-                onChange={(e) => setNewHealthType(e.target.value as any)}
+                onChange={(e) => setNewHealthType(e.target.value as HealthEventType)}
                 className="p-2 border border-gray-200 rounded text-sm bg-white"
               >
                 <option value="Vaccination">Vaccination</option>
