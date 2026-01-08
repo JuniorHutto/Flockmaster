@@ -1,0 +1,5 @@
+{
+  "name": "FlockMaster",
+  "description": "Comprehensive sheep management system for tracking flock inventory, health records, breeding data, and weight performance. Optimized for Katahdin and commercial hair sheep producers.",
+  "requestFramePermissions": []
+}
