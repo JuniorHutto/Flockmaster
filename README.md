@@ -1,7 +1,7 @@
 # Flockmaster
 Sheep management application
 ## Intro
-I statred with an spreadsheet I download from Oklahoma State Extention for lamb records. The used AI Studio to create a sheep management tool.
+I statred with a spreadsheet I download from Oklahoma State Extention for lamb records. I used AI Studio to create a sheep management tool.
 <div align="center">
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
