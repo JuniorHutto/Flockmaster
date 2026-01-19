@@ -1,6 +1,7 @@
-import { Sheep, Gender, Status } from '../types';
+import { Sheep, Gender, Status, Task } from '../types';
 
 const STORAGE_KEY = 'flockmaster_data_v1';
+const TASKS_STORAGE_KEY = 'flockmaster_tasks_v1';
 
 // Seed data based on the PDF context (Freckles, Friendly, etc.)
 const SEED_DATA: Sheep[] = [
@@ -61,6 +62,28 @@ const SEED_DATA: Sheep[] = [
   }
 ];
 
+const SEED_TASKS: Task[] = [
+  {
+    id: '1',
+    title: 'Order Hay',
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week from now
+    status: 'Pending',
+    assignedTo: 'John',
+    description: 'Order 50 bales of orchard grass for winter.',
+    reminderType: '1 Week Before',
+    reminderSent: false
+  },
+  {
+    id: '2',
+    title: 'Vaccinate Lambs',
+    dueDate: new Date().toISOString().split('T')[0],
+    status: 'In Progress',
+    assignedTo: 'Vet',
+    reminderType: 'Same Day',
+    reminderSent: false
+  }
+];
+
 export const getSheep = (): Sheep[] => {
   const data = localStorage.getItem(STORAGE_KEY);
   if (!data) {
@@ -93,4 +116,39 @@ export const deleteSheep = (id: string): void => {
 export const getSheepById = (id: string): Sheep | undefined => {
   const allSheep = getSheep();
   return allSheep.find(s => s.id === id);
+};
+
+// --- Task Functions ---
+
+export const getTasks = (): Task[] => {
+  const data = localStorage.getItem(TASKS_STORAGE_KEY);
+  if (!data) {
+    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(SEED_TASKS));
+    return SEED_TASKS;
+  }
+  return JSON.parse(data);
+};
+
+export const saveTask = (task: Task): void => {
+  const allTasks = getTasks();
+  const existingIndex = allTasks.findIndex(t => t.id === task.id);
+  
+  if (existingIndex >= 0) {
+    allTasks[existingIndex] = task;
+  } else {
+    allTasks.push(task);
+  }
+  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(allTasks));
+};
+
+export const deleteTask = (id: string): void => {
+  const allTasks = getTasks();
+  const filtered = allTasks.filter(t => t.id !== id);
+  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(filtered));
+};
+
+export const deleteCompletedTasks = (): void => {
+  const allTasks = getTasks();
+  const activeTasks = allTasks.filter(t => t.status !== 'Completed');
+  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(activeTasks));
 };

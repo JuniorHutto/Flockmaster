@@ -41,9 +41,25 @@ export interface Sheep {
   damId?: string;
   status: Status;
   color?: string;
+  saleDate?: string;
+  salePrice?: number;
   weights: WeightRecord[];
   health: HealthRecord[];
   notes?: string;
+}
+
+export type TaskStatus = 'Pending' | 'In Progress' | 'Completed';
+export type ReminderType = 'None' | 'Same Day' | '1 Day Before' | '2 Days Before' | '1 Week Before';
+
+export interface Task {
+  id: string;
+  title: string;
+  dueDate: string;
+  status: TaskStatus;
+  assignedTo?: string;
+  description?: string;
+  reminderType?: ReminderType;
+  reminderSent?: boolean;
 }
 
 export type ViewState = 
@@ -51,4 +67,5 @@ export type ViewState =
   | { view: 'LIST' }
   | { view: 'ADD' }
   | { view: 'EDIT'; sheepId: string; }
-  | { view: 'DETAIL'; sheepId: string; };
+  | { view: 'DETAIL'; sheepId: string; }
+  | { view: 'TASKS' };

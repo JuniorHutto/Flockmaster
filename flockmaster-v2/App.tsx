@@ -5,7 +5,8 @@ import { Dashboard } from './components/Dashboard';
 import { SheepList } from './components/SheepList';
 import { SheepForm } from './components/SheepForm';
 import { SheepDetail } from './components/SheepDetail';
-import { LayoutGrid, List, Plus, Settings, Sprout } from 'lucide-react';
+import { TaskManager } from './components/TaskManager';
+import { LayoutGrid, List, Plus, Settings, CheckSquare } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>({ view: 'DASHBOARD' });
@@ -75,6 +76,8 @@ const App: React.FC = () => {
             onDelete={() => handleDeleteSheep(sheepDetail.id)}
           />
         );
+      case 'TASKS':
+        return <TaskManager />;
       default:
         return <div>Not implemented</div>;
     }
@@ -86,9 +89,11 @@ const App: React.FC = () => {
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-64 bg-white border-r border-gray-100 flex-shrink-0">
         <div className="p-6 flex items-center gap-3 border-b border-gray-100">
-          <div className="bg-emerald-600 p-2 rounded-lg">
-            <Sprout className="text-white" size={24} />
-          </div>
+          <img 
+            src="/sheep.jpg" 
+            alt="FlockMaster Logo" 
+            className="w-10 h-10 object-contain"
+          />
           <h1 className="text-xl font-bold text-gray-800 tracking-tight">FlockMaster</h1>
         </div>
         
@@ -118,6 +123,15 @@ const App: React.FC = () => {
           >
             <Plus size={20} />
             Add Sheep
+          </button>
+
+          <button 
+            onClick={() => setViewState({ view: 'TASKS' })}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+              ${viewState.view === 'TASKS' ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}
+          >
+            <CheckSquare size={20} />
+            Tasks
           </button>
         </nav>
 

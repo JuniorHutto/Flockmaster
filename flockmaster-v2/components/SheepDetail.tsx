@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sheep, WeightRecord, HealthRecord, Gender, HealthEventType } from '../types';
+import { Sheep, WeightRecord, HealthRecord, Gender, HealthEventType, Status } from '../types';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { ArrowLeft, Edit2, Scale, Syringe, Save, Trash2, Calendar, Droplet, Activity } from 'lucide-react';
+import { ArrowLeft, Edit2, Scale, Syringe, Save, Trash2, Calendar, Droplet, Activity, DollarSign } from 'lucide-react';
 
 interface SheepDetailProps {
   sheep: Sheep;
@@ -17,6 +17,7 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
   
   const [newHealthType, setNewHealthType] = useState<HealthEventType>('Vaccination');
   const [newHealthDesc, setNewHealthDesc] = useState('');
+  const [newHealthCost, setNewHealthCost] = useState('');
   const [newHealthDate, setNewHealthDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleAddWeight = () => {
@@ -37,11 +38,13 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
       id: Date.now().toString(),
       date: newHealthDate,
       type: newHealthType,
-      description: newHealthDesc
+      description: newHealthDesc,
+      cost: newHealthCost ? parseFloat(newHealthCost) : undefined
     };
     const updated = { ...sheep, health: [...sheep.health, healthRec] };
     onUpdate(updated);
     setNewHealthDesc('');
+    setNewHealthCost('');
   };
 
   const sortedWeights = [...sheep.weights].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -105,9 +108,23 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
               </div>
             </div>
 
+            {/* Sale Info */}
+            {sheep.status === Status.Sold && (
+              <div className="mt-6 bg-yellow-50 p-4 rounded-lg border border-yellow-100 flex gap-6">
+                <div>
+                   <p className="text-sm text-yellow-800 font-medium mb-1 flex items-center"><Calendar size={14} className="mr-1"/> Sale Date</p>
+                   <p className="font-bold text-gray-800">{sheep.saleDate || 'N/A'}</p>
+                </div>
+                <div>
+                   <p className="text-sm text-yellow-800 font-medium mb-1 flex items-center"><DollarSign size={14} className="mr-1"/> Sale Price</p>
+                   <p className="font-bold text-gray-800">{sheep.salePrice ? `$${sheep.salePrice.toFixed(2)}` : 'N/A'}</p>
+                </div>
+              </div>
+            )}
+
             {sheep.notes && (
-              <div className="mt-6 bg-yellow-50 p-4 rounded-lg border border-yellow-100">
-                <p className="text-sm text-yellow-800 font-medium mb-1">Notes</p>
+              <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <p className="text-sm text-gray-500 font-medium mb-1">Notes</p>
                 <p className="text-gray-700 italic">{sheep.notes}</p>
               </div>
             )}
@@ -209,25 +226,40 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
 
           <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100">
             <h4 className="text-sm font-semibold text-gray-700 mb-3">Add Health Record</h4>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <input 
-                type="date" 
-                value={newHealthDate}
-                onChange={(e) => setNewHealthDate(e.target.value)}
-                className="p-2 border border-gray-200 rounded text-sm"
-              />
-              <select 
-                value={newHealthType}
-                onChange={(e) => setNewHealthType(e.target.value as HealthEventType)}
-                className="p-2 border border-gray-200 rounded text-sm bg-white"
-              >
-                <option value="Vaccination">Vaccination</option>
-                <option value="Deworming">Deworming</option>
-                <option value="Injury">Injury</option>
-                <option value="Hoof Trim">Hoof Trim</option>
-                <option value="Lambing">Lambing</option>
-                <option value="Other">Other</option>
-              </select>
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3">
+              <div className="sm:col-span-4">
+                <input 
+                  type="date" 
+                  value={newHealthDate}
+                  onChange={(e) => setNewHealthDate(e.target.value)}
+                  className="w-full p-2 border border-gray-200 rounded text-sm"
+                />
+              </div>
+              <div className="sm:col-span-5">
+                <select 
+                  value={newHealthType}
+                  onChange={(e) => setNewHealthType(e.target.value as HealthEventType)}
+                  className="w-full p-2 border border-gray-200 rounded text-sm bg-white"
+                >
+                  <option value="Vaccination">Vaccination</option>
+                  <option value="Deworming">Deworming</option>
+                  <option value="Injury">Injury</option>
+                  <option value="Hoof Trim">Hoof Trim</option>
+                  <option value="Lambing">Lambing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div className="sm:col-span-3">
+                 <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Cost ($)"
+                  value={newHealthCost}
+                  onChange={(e) => setNewHealthCost(e.target.value)}
+                  className="w-full p-2 border border-gray-200 rounded text-sm"
+                />
+              </div>
             </div>
             <div className="flex gap-3">
               <input 
@@ -261,7 +293,10 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
                  <div className="flex-1">
                    <div className="flex justify-between items-start">
                      <p className="font-semibold text-gray-800">{h.type}</p>
-                     <span className="text-xs text-gray-500 flex items-center"><Calendar size={12} className="mr-1"/>{h.date}</span>
+                     <div className="text-right">
+                        <span className="text-xs text-gray-500 flex items-center justify-end"><Calendar size={12} className="mr-1"/>{h.date}</span>
+                        {h.cost && <span className="text-xs font-semibold text-gray-700 block mt-1">${h.cost.toFixed(2)}</span>}
+                     </div>
                    </div>
                    <p className="text-sm text-gray-600 mt-1">{h.description}</p>
                  </div>

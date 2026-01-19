@@ -20,6 +20,8 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
     sireId: '',
     color: '',
     notes: '',
+    saleDate: '',
+    salePrice: undefined,
     weights: [],
     health: []
   });
@@ -49,6 +51,8 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
       sireId: formData.sireId,
       color: formData.color,
       notes: formData.notes,
+      saleDate: formData.status === Status.Sold ? formData.saleDate : undefined,
+      salePrice: formData.status === Status.Sold ? formData.salePrice : undefined,
       weights: formData.weights || [],
       health: formData.health || []
     };
@@ -120,6 +124,33 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
               <option value={Status.Deceased}>Deceased</option>
             </select>
           </div>
+
+          {/* Sale Fields - Only Show if Status is Sold */}
+          {formData.status === Status.Sold && (
+            <div className="col-span-1 md:col-span-2 bg-yellow-50 p-4 rounded-lg border border-yellow-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-yellow-800 mb-2">Sale Date</label>
+                <input 
+                  type="date" 
+                  className="w-full p-3 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-white"
+                  value={formData.saleDate || ''}
+                  onChange={(e) => setFormData({...formData, saleDate: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-yellow-800 mb-2">Sale Price ($)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  step="0.01"
+                  className="w-full p-3 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 outline-none bg-white"
+                  placeholder="0.00"
+                  value={formData.salePrice || ''}
+                  onChange={(e) => setFormData({...formData, salePrice: parseFloat(e.target.value)})}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Breed */}
           <div>

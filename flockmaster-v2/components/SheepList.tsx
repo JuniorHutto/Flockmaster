@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sheep, Gender, Status } from '../types';
-import { Search, Filter, Plus, ChevronRight } from 'lucide-react';
+import { Search, Filter, Plus, ChevronRight, Download, Calendar } from 'lucide-react';
+import { exportFlockData } from '../services/exportService';
 
 interface SheepListProps {
   sheep: Sheep[];
@@ -11,6 +12,8 @@ interface SheepListProps {
 export const SheepList: React.FC<SheepListProps> = ({ sheep, onAdd, onSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<Status | 'All'>('All');
+  const [dobStart, setDobStart] = useState('');
+  const [dobEnd, setDobEnd] = useState('');
 
   const filteredSheep = sheep.filter(s => {
     const matchesSearch = 
@@ -19,17 +22,22 @@ export const SheepList: React.FC<SheepListProps> = ({ sheep, onAdd, onSelect }) 
     
     const matchesStatus = filterStatus === 'All' || s.status === filterStatus;
 
-    return matchesSearch && matchesStatus;
+    const matchesDob = (!dobStart || s.dob >= dobStart) && 
+                       (!dobEnd || s.dob <= dobEnd);
+
+    return matchesSearch && matchesStatus && matchesDob;
   });
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Header Controls */}
-      <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-        <h2 className="text-xl font-bold text-gray-800">Flock Inventory</h2>
+      <div className="p-6 border-b border-gray-100 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+        <h2 className="text-xl font-bold text-gray-800 whitespace-nowrap">Flock Inventory</h2>
         
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full xl:w-auto items-center">
+          
+          {/* Search */}
+          <div className="relative w-full sm:w-auto sm:flex-1 xl:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input 
               type="text" 
@@ -40,7 +48,8 @@ export const SheepList: React.FC<SheepListProps> = ({ sheep, onAdd, onSelect }) 
             />
           </div>
 
-          <div className="relative">
+          {/* Status Filter */}
+          <div className="relative w-full sm:w-auto">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <select 
               className="pl-10 pr-8 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none bg-white w-full"
@@ -54,13 +63,47 @@ export const SheepList: React.FC<SheepListProps> = ({ sheep, onAdd, onSelect }) 
             </select>
           </div>
 
-          <button 
-            onClick={onAdd}
-            className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            <Plus size={18} />
-            Add Sheep
-          </button>
+          {/* DOB Range Filter */}
+          <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 bg-white w-full sm:w-auto">
+            <Calendar size={18} className="text-gray-400 flex-shrink-0" />
+            <div className="flex items-center gap-2">
+              <input 
+                type="date" 
+                className="text-sm outline-none text-gray-600 bg-transparent w-full sm:w-32"
+                value={dobStart}
+                onChange={(e) => setDobStart(e.target.value)}
+                title="Born After"
+              />
+              <span className="text-gray-400">-</span>
+              <input 
+                type="date" 
+                className="text-sm outline-none text-gray-600 bg-transparent w-full sm:w-32"
+                value={dobEnd}
+                onChange={(e) => setDobEnd(e.target.value)}
+                title="Born Before"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 w-full sm:w-auto ml-auto sm:ml-0">
+            <button 
+              onClick={() => exportFlockData(filteredSheep)}
+              className="flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors flex-1 sm:flex-none"
+              title="Export filtered list to CSV"
+            >
+              <Download size={18} />
+              <span className="sm:hidden xl:inline">Export</span>
+            </button>
+
+            <button 
+              onClick={onAdd}
+              className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-colors flex-1 sm:flex-none"
+            >
+              <Plus size={18} />
+              <span className="whitespace-nowrap">Add Sheep</span>
+            </button>
+          </div>
         </div>
       </div>
 

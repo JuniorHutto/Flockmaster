@@ -107,7 +107,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Flock Composition</h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={compositionData}
@@ -140,7 +140,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Average Weights (lbs)</h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weightData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" />
