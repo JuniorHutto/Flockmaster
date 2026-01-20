@@ -29,17 +29,8 @@ Once running, visit `http://localhost:port` to start managing your flock.
 
 ## 📖 Documentation
 
-For detailed guides on setup, the database structure, and how we handle the math, visit our **[GitHub Wiki](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki)**:
-
-- [Calculation Logic & OSU Formulas](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Logic-and-Formulas)
+For detailed guides on setup, the database structure, and how we handle the math, visit our **[GitHub Wiki](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki)**
     
-- [Database Schema](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Database-Schema)
-    
-- [Deployment & Troubleshooting](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Troubleshooting)
-    
-- [Future Roadmap (GIS & Pasture Management)](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Roadmap)
-    
-
 ## 🛠️ Built With
 
 - **Frontend:** Google AI Studio
@@ -51,4 +42,4 @@ For detailed guides on setup, the database structure, and how we handle the math
 
 ---
 
-_Developed by **Junior Hutto** as part of the [hutto.io](https://www.google.com/search?q=https://hutto.io) regenerative farming initiative._
+_Developed by **Junior Hutto** as part of the [https://blog.hutto.io) regenerative farming initiative._
