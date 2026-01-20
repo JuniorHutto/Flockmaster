@@ -1,36 +1,54 @@
-<img  width="250" height="250" alt="image" src="https://github.com/user-attachments/assets/565ee07f-6db9-4597-ab6c-2ef425dc54c8" />
+# 🐏 Flockmaster
 
+**Flockmaster** is a self-hosted, mobile-friendly web application for sheep producers, built to replace traditional spreadsheets with a modern management interface. It is specifically designed to implement the performance records and adjustment formulas provided by the **Oklahoma State University (OSU) Extension Service**.
 
+## ✨ Features
 
+- **OSU-Standard Logic:** Automatically calculates adjusted weaning weights (60/90/120 day) and handles Age-of-Dam multipliers.
+    
+- **Performance Dashboard:** Real-time metrics for flock composition, average weights, and Average Daily Gain (ADG).
+    
+- **Lineage Tracking:** Deep-link lambs to sires and dams for better genetic selection.
+    
+- **Health Management:** Log vaccinations and treatments with built-in withdrawal date tracking.
+    
+- **Home-Lab Ready:** Optimized for Docker and Proxmox environments.
+    
 
-## 🚀 Quick Start Guide
-Flockmaster is a web-based management tool designed to take the robust calculations of the Oklahoma State Extension Service sheep records and move them into a mobile-friendly, self-hosted environment.
+## 🚀 Quick Start
 
-### Prerequisites
-Before deploying, ensure you have the following ready in your environment:
+The fastest way to get Flockmaster running is via Docker:
 
-Docker & Docker Compose (Tested on Ubuntu/Fedora)
-
-Internal Network Access (If using Proxmox/Nginx Proxy Manager)
-
-### Deployment
-Clone the repository and bring up the stack:
 Bash
+
 ```
-git clone https://github.com/JuniorHutto/Flockmaster.git
-cd Flockmaster
 docker-compose up -d
 ```
-### Initial Configuration
-Once the container is running, access the UI at http://<your-ip>:port.
 
-Sync Spreadsheet Data: If you are migrating from the OSU Excel sheet, use the Import tool (currently supporting CSV).
+Once running, visit `http://localhost:port` to start managing your flock.
 
-Define Your Flock: Head to the Flock Overview to verify your initial counts for Ewes, Rams, and Lambs.
+## 📖 Documentation
 
-### Key Features
-Extension Logic: Automatically handles adjusted weaning weights based on OSU standards.
+For detailed guides on setup, the database structure, and how we handle the math, visit our **[GitHub Wiki](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki)**:
 
-Health Tracking: Log vaccinations, deworming, and weight checks directly from your phone while in the field.
+- [Calculation Logic & OSU Formulas](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Logic-and-Formulas)
+    
+- [Database Schema](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Database-Schema)
+    
+- [Deployment & Troubleshooting](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Troubleshooting)
+    
+- [Future Roadmap (GIS & Pasture Management)](https://www.google.com/search?q=https://github.com/JuniorHutto/Flockmaster/wiki/Roadmap)
+    
 
-Visual Insights: Live dashboard showing average weights and flock composition.
+## 🛠️ Built With
+
+- **Frontend:** Google AI Studio
+    
+- **Backend:** Node
+    
+- **Infrastructure:** Docker
+    
+
+---
+
+_Developed by **Junior Hutto** as part of the [hutto.io](https://www.google.com/search?q=https://hutto.io) regenerative farming initiative._
