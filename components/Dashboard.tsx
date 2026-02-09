@@ -13,6 +13,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
   
   const activeSheep = useMemo(() => sheep.filter(s => s.status === Status.Active), [sheep]);
   
+  const pregnantEwes = useMemo(() => 
+    activeSheep.filter(s => s.gender === Gender.Ewe && s.isPregnant === true)
+      .sort((a, b) => {
+        if (!a.dueDate || !b.dueDate) return 0;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      }), 
+  [activeSheep]);
+
   const stats = useMemo(() => {
     const ewes = activeSheep.filter(s => s.gender === Gender.Ewe).length;
     const rams = activeSheep.filter(s => s.gender === Gender.Ram).length;
@@ -101,6 +109,41 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
           </div>
         </div>
       </div>
+
+      {/* Pregnant Ewes Section */}
+      {pregnantEwes.length > 0 && (
+        <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-6 rounded-xl shadow-sm border border-pink-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-pink-900 flex items-center">
+              <Activity size={24} className="mr-2"/> Pregnant Ewes ({pregnantEwes.length})
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pregnantEwes.map(ewe => (
+              <div key={ewe.id} className="bg-white p-4 rounded-lg border border-pink-200 shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <p className="font-bold text-gray-800">{ewe.tagId}</p>
+                    {ewe.name && <p className="text-sm text-gray-600">{ewe.name}</p>}
+                  </div>
+                  <span className="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-semibold rounded-full">
+                    Pregnant
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600 space-y-1">
+                  <p><span className="font-medium">Bred:</span> {ewe.breedingDate}</p>
+                  <p><span className="font-medium">Due:</span> {ewe.dueDate}</p>
+                  {ewe.dueDate && (
+                    <p className="font-semibold text-pink-700">
+                      {Math.ceil((new Date(ewe.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days left
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

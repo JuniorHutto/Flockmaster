@@ -122,6 +122,31 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
               </div>
             )}
 
+            {/* Breeding Info - For Pregnant Ewes */}
+            {sheep.gender === Gender.Ewe && sheep.isPregnant && sheep.breedingDate && (
+              <div className="mt-6 bg-pink-50 p-4 rounded-lg border border-pink-200">
+                <p className="text-sm font-semibold text-pink-900 mb-3 flex items-center">
+                  <Activity size={16} className="mr-2"/> Pregnancy Information
+                </p>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-xs text-pink-700 mb-1">Breeding Date</p>
+                    <p className="font-bold text-gray-800">{sheep.breedingDate}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-pink-700 mb-1">Expected Due Date</p>
+                    <p className="font-bold text-gray-800">{sheep.dueDate || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-pink-700 mb-1">Days Until Due</p>
+                    <p className="font-bold text-pink-600">
+                      {sheep.dueDate ? Math.ceil((new Date(sheep.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {sheep.notes && (
               <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <p className="text-sm text-gray-500 font-medium mb-1">Notes</p>

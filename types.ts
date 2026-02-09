@@ -46,6 +46,9 @@ export interface Sheep {
   weights: WeightRecord[];
   health: HealthRecord[];
   notes?: string;
+  breedingDate?: string;
+  isPregnant?: boolean;
+  dueDate?: string;
 }
 
 export type TaskStatus = 'Pending' | 'In Progress' | 'Completed';

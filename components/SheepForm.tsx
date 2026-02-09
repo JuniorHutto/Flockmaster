@@ -23,7 +23,10 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
     saleDate: '',
     salePrice: undefined,
     weights: [],
-    health: []
+    health: [],
+    breedingDate: '',
+    isPregnant: false,
+    dueDate: ''
   });
 
   useEffect(() => {
@@ -31,6 +34,24 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
       setFormData(initialData);
     }
   }, [initialData]);
+
+  // Calculate due date when breeding date changes (sheep gestation: 147 days)
+  const calculateDueDate = (breedingDate: string): string => {
+    if (!breedingDate) return '';
+    const date = new Date(breedingDate);
+    date.setDate(date.getDate() + 147);
+    return date.toISOString().split('T')[0];
+  };
+
+  const handleBreedingDateChange = (date: string) => {
+    const dueDate = calculateDueDate(date);
+    setFormData({
+      ...formData,
+      breedingDate: date,
+      dueDate: dueDate,
+      isPregnant: date ? true : false
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +75,10 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
       saleDate: formData.status === Status.Sold ? formData.saleDate : undefined,
       salePrice: formData.status === Status.Sold ? formData.salePrice : undefined,
       weights: formData.weights || [],
-      health: formData.health || []
+      health: formData.health || [],
+      breedingDate: formData.gender === Gender.Ewe ? formData.breedingDate : undefined,
+      isPregnant: formData.gender === Gender.Ewe ? formData.isPregnant : false,
+      dueDate: formData.gender === Gender.Ewe ? formData.dueDate : undefined
     };
     
     onSave(sheep);
@@ -198,6 +222,67 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
             />
           </div>
         </div>
+
+        {/* Breeding Information - Only Show for Ewes */}
+        {formData.gender === Gender.Ewe && (
+          <div className="bg-pink-50 p-6 rounded-lg border border-pink-100 space-y-4">
+            <h3 className="text-lg font-semibold text-pink-900 mb-4">Breeding Information</h3>
+            
+            <div className="flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                id="isPregnant"
+                checked={formData.isPregnant || false}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  if (!checked) {
+                    setFormData({
+                      ...formData,
+                      isPregnant: false,
+                      breedingDate: '',
+                      dueDate: ''
+                    });
+                  } else {
+                    setFormData({...formData, isPregnant: true});
+                  }
+                }}
+                className="w-5 h-5 accent-pink-600"
+              />
+              <label htmlFor="isPregnant" className="text-sm font-medium text-gray-700">
+                Is Pregnant
+              </label>
+            </div>
+
+            {formData.isPregnant && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-pink-800 mb-2">Breeding Date</label>
+                  <input 
+                    type="date" 
+                    className="w-full p-3 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none bg-white"
+                    value={formData.breedingDate || ''}
+                    onChange={(e) => handleBreedingDateChange(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-pink-800 mb-2">Expected Due Date (147 days)</label>
+                  <input 
+                    type="date" 
+                    className="w-full p-3 border border-pink-200 rounded-lg bg-pink-100 outline-none cursor-not-allowed"
+                    value={formData.dueDate || ''}
+                    readOnly
+                    disabled
+                  />
+                  {formData.dueDate && (
+                    <p className="text-xs text-pink-700 mt-1">
+                      {Math.ceil((new Date(formData.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Color */}
         <div>
