@@ -24,6 +24,7 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
     salePrice: undefined,
     weights: [],
     health: [],
+    breedingRecords: [],
     breedingDate: '',
     isPregnant: false,
     dueDate: ''
@@ -76,6 +77,7 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
       salePrice: formData.status === Status.Sold ? formData.salePrice : undefined,
       weights: formData.weights || [],
       health: formData.health || [],
+      breedingRecords: formData.breedingRecords || [],
       breedingDate: formData.gender === Gender.Ewe ? formData.breedingDate : undefined,
       isPregnant: formData.gender === Gender.Ewe ? formData.isPregnant : false,
       dueDate: formData.gender === Gender.Ewe ? formData.dueDate : undefined

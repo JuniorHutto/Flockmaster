@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { ViewState, Sheep } from './types';
+import { ViewState, Sheep, HerdExpense, HerdRevenue } from './types';
 import { getSheep, saveSheep, deleteSheep, getSheepById } from './services/storageService';
 import { Dashboard } from './components/Dashboard';
 import { SheepList } from './components/SheepList';
 import { SheepForm } from './components/SheepForm';
 import { SheepDetail } from './components/SheepDetail';
 import { TaskManager } from './components/TaskManager';
-import { LayoutGrid, List, Plus, Settings, CheckSquare } from 'lucide-react';
+import { ProfitabilityView } from './components/ProfitabilityView';
+import { LayoutGrid, List, Plus, Settings, CheckSquare, TrendingUp } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>({ view: 'DASHBOARD' });
   const [data, setData] = useState<Sheep[]>([]);
+  const [expenses, setExpenses] = useState<HerdExpense[]>([]);
+  const [revenues, setRevenues] = useState<HerdRevenue[]>([]);
 
   // Load data on mount
   useEffect(() => {
     setData(getSheep());
+    const savedExpenses = localStorage.getItem('herdExpenses');
+    const savedRevenues = localStorage.getItem('herdRevenues');
+    if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
+    if (savedRevenues) setRevenues(JSON.parse(savedRevenues));
   }, []);
 
   const handleSaveSheep = (sheep: Sheep) => {
@@ -27,6 +34,30 @@ const App: React.FC = () => {
     deleteSheep(id);
     setData(getSheep());
     setViewState({ view: 'LIST' });
+  };
+
+  const handleAddExpense = (expense: HerdExpense) => {
+    const updated = [...expenses, expense];
+    setExpenses(updated);
+    localStorage.setItem('herdExpenses', JSON.stringify(updated));
+  };
+
+  const handleAddRevenue = (revenue: HerdRevenue) => {
+    const updated = [...revenues, revenue];
+    setRevenues(updated);
+    localStorage.setItem('herdRevenues', JSON.stringify(updated));
+  };
+
+  const handleDeleteExpense = (id: string) => {
+    const updated = expenses.filter(e => e.id !== id);
+    setExpenses(updated);
+    localStorage.setItem('herdExpenses', JSON.stringify(updated));
+  };
+
+  const handleDeleteRevenue = (id: string) => {
+    const updated = revenues.filter(r => r.id !== id);
+    setRevenues(updated);
+    localStorage.setItem('herdRevenues', JSON.stringify(updated));
   };
 
   const renderContent = () => {
@@ -78,6 +109,17 @@ const App: React.FC = () => {
         );
       case 'TASKS':
         return <TaskManager />;
+      case 'PROFITABILITY':
+        return (
+          <ProfitabilityView 
+            expenses={expenses}
+            revenues={revenues}
+            onAddExpense={handleAddExpense}
+            onAddRevenue={handleAddRevenue}
+            onDeleteExpense={handleDeleteExpense}
+            onDeleteRevenue={handleDeleteRevenue}
+          />
+        );
       default:
         return <div>Not implemented</div>;
     }
@@ -133,9 +175,18 @@ const App: React.FC = () => {
             <CheckSquare size={20} />
             Tasks
           </button>
+
+          <button 
+            onClick={() => setViewState({ view: 'PROFITABILITY' })}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+              ${viewState.view === 'PROFITABILITY' ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}
+          >
+            <TrendingUp size={20} />
+            Profitability
+          </button>
         </nav>
 
-        <div className="absolute bottom-0 w-full md:w-64 p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-gray-100">
           <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 transition-colors">
             <Settings size={20} />
             Settings

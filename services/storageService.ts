@@ -23,7 +23,8 @@ const SEED_DATA: Sheep[] = [
     health: [
       { id: 'h1', date: '2020-04-01', type: 'Vaccination', description: 'CD&T Booster' },
       { id: 'h2', date: '2020-06-01', type: 'Deworming', description: 'Clean, no treatment needed (FAMACHA 1)' }
-    ]
+    ],
+    breedingRecords: []
   },
   {
     id: '2',
@@ -40,7 +41,8 @@ const SEED_DATA: Sheep[] = [
       { id: 'w2', date: '2020-05-10', weight: 52 },
       { id: 'w3', date: '2021-03-01', weight: 165 }
     ],
-    health: []
+    health: [],
+    breedingRecords: []
   },
   {
     id: '3',
@@ -58,7 +60,8 @@ const SEED_DATA: Sheep[] = [
       { id: 'w2', date: '2021-04-20', weight: 65 },
       { id: 'w3', date: '2022-01-15', weight: 210 }
     ],
-    health: []
+    health: [],
+    breedingRecords: []
   }
 ];
 
@@ -91,7 +94,12 @@ export const getSheep = (): Sheep[] => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATA));
     return SEED_DATA;
   }
-  return JSON.parse(data);
+  const sheep = JSON.parse(data);
+  // Ensure all sheep have breedingRecords array for backward compatibility
+  return sheep.map((s: any) => ({
+    ...s,
+    breedingRecords: s.breedingRecords || []
+  }));
 };
 
 export const saveSheep = (sheep: Sheep): void => {

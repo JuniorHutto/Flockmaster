@@ -22,6 +22,17 @@ export interface WeightRecord {
   note?: string;
 }
 
+export interface BreedingRecord {
+  id: string;
+  date: string;
+  sireId: string;
+  sireName?: string;
+  pregnancyCheckDate?: string;
+  isPregnant?: boolean;
+  lambBornDate?: string;
+  notes?: string;
+}
+
 export interface HealthRecord {
   id: string;
   date: string;
@@ -45,6 +56,7 @@ export interface Sheep {
   salePrice?: number;
   weights: WeightRecord[];
   health: HealthRecord[];
+  breedingRecords: BreedingRecord[];
   notes?: string;
   breedingDate?: string;
   isPregnant?: boolean;
@@ -53,6 +65,26 @@ export interface Sheep {
 
 export type TaskStatus = 'Pending' | 'In Progress' | 'Completed';
 export type ReminderType = 'None' | 'Same Day' | '1 Day Before' | '2 Days Before' | '1 Week Before';
+
+export type ExpenseCategory = 'Feed' | 'Bedding' | 'Mineral' | 'Veterinary' | 'Other';
+export type RevenueCategory = 'Meat' | 'Breeding Stock' | 'Wool' | 'Other';
+
+export interface HerdExpense {
+  id: string;
+  date: string;
+  category: ExpenseCategory;
+  amount: number;
+  description?: string;
+}
+
+export interface HerdRevenue {
+  id: string;
+  date: string;
+  category: RevenueCategory;
+  sheepId?: string;
+  amount: number;
+  description?: string;
+}
 
 export interface Task {
   id: string;
@@ -71,4 +103,5 @@ export type ViewState =
   | { view: 'ADD' }
   | { view: 'EDIT'; sheepId: string; }
   | { view: 'DETAIL'; sheepId: string; }
-  | { view: 'TASKS' };
+  | { view: 'TASKS' }
+  | { view: 'PROFITABILITY' };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Sheep, WeightRecord, HealthRecord, Gender, HealthEventType, Status } from '../types';
+import { Sheep, WeightRecord, HealthRecord, Gender, HealthEventType, Status, BreedingRecord } from '../types';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import { ArrowLeft, Edit2, Scale, Syringe, Save, Trash2, Calendar, Droplet, Activity, DollarSign } from 'lucide-react';
+import { ArrowLeft, Edit2, Scale, Syringe, Save, Trash2, Calendar, Droplet, Activity, DollarSign, Heart } from 'lucide-react';
 
 interface SheepDetailProps {
   sheep: Sheep;
@@ -19,6 +19,9 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
   const [newHealthDesc, setNewHealthDesc] = useState('');
   const [newHealthCost, setNewHealthCost] = useState('');
   const [newHealthDate, setNewHealthDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const [newBreedingSireId, setNewBreedingSireId] = useState('');
+  const [newBreedingDate, setNewBreedingDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handleAddWeight = () => {
     if (!newWeight) return;
@@ -45,6 +48,25 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
     onUpdate(updated);
     setNewHealthDesc('');
     setNewHealthCost('');
+  };
+
+  const handleAddBreedingRecord = () => {
+    if (!newBreedingSireId) return;
+    const breedingRec: BreedingRecord = {
+      id: Date.now().toString(),
+      date: newBreedingDate,
+      sireId: newBreedingSireId,
+      sireName: undefined
+    };
+    const updated = { ...sheep, breedingRecords: [...(sheep.breedingRecords || []), breedingRec] };
+    onUpdate(updated);
+    setNewBreedingSireId('');
+    setNewBreedingDate(new Date().toISOString().split('T')[0]);
+  };
+
+  const handleDeleteBreedingRecord = (id: string) => {
+    const updated = { ...sheep, breedingRecords: sheep.breedingRecords?.filter(r => r.id !== id) || [] };
+    onUpdate(updated);
   };
 
   const sortedWeights = [...sheep.weights].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -335,6 +357,82 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
         </div>
 
       </div>
+
+      {/* Breeding Records Section - for Ewes */}
+      {sheep.gender === Gender.Ewe && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-gray-800 flex items-center">
+              <Heart className="mr-2 text-pink-600" size={20}/> Breeding Records
+            </h3>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-100">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">Add Breeding Record</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input 
+                type="date" 
+                value={newBreedingDate}
+                onChange={(e) => setNewBreedingDate(e.target.value)}
+                className="p-2 border border-gray-200 rounded text-sm"
+                placeholder="Breeding Date"
+              />
+              <input 
+                type="text" 
+                placeholder="Sire ID / Name" 
+                value={newBreedingSireId}
+                onChange={(e) => setNewBreedingSireId(e.target.value)}
+                className="p-2 border border-gray-200 rounded text-sm"
+              />
+              <button 
+                onClick={handleAddBreedingRecord}
+                className="bg-pink-600 text-white p-2 rounded hover:bg-pink-700"
+              >
+                <Save size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+            {(!sheep.breedingRecords || sheep.breedingRecords.length === 0) ? (
+              <p className="text-center text-gray-400 py-8">No breeding records found.</p>
+            ) : (
+              sheep.breedingRecords.map(record => (
+                <div key={record.id} className="flex gap-4 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-pink-100 text-pink-600">
+                    <Heart size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold text-gray-800">Sire: {record.sireName || record.sireId}</p>
+                        <p className="text-sm text-gray-600">Breeding Date: {record.date}</p>
+                        {record.pregnancyCheckDate && (
+                          <>
+                            <p className="text-sm text-gray-600">Pregnancy Check: {record.pregnancyCheckDate}</p>
+                            <p className={`text-sm font-medium ${record.isPregnant ? 'text-green-600' : 'text-red-600'}`}>
+                              {record.isPregnant ? '✓ Pregnant' : '✗ Not Pregnant'}
+                            </p>
+                          </>
+                        )}
+                        {record.lambBornDate && (
+                          <p className="text-sm text-green-600 font-medium">Lambs Born: {record.lambBornDate}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteBreedingRecord(record.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
