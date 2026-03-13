@@ -78,6 +78,9 @@ flockmaster/
 3. **Edit Records**: Update sheep information as needed
 4. **Manage Tasks**: Use the task manager to track breeding and other herd management activities
 
+## Demo
+[Flockmaster Demo](https://flockmaster.hutto.io)
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
