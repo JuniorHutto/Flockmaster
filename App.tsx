@@ -7,7 +7,7 @@ import { SheepForm } from './components/SheepForm';
 import { SheepDetail } from './components/SheepDetail';
 import { TaskManager } from './components/TaskManager';
 import { ProfitabilityView } from './components/ProfitabilityView';
-import { LayoutGrid, List, Plus, Settings, CheckSquare, TrendingUp } from 'lucide-react';
+import { LayoutGrid, List, Plus, CheckSquare, TrendingUp } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>({ view: 'DASHBOARD' });
@@ -186,12 +186,6 @@ const App: React.FC = () => {
           </button>
         </nav>
 
-        <div className="p-4 border-t border-gray-100">
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-gray-600 transition-colors">
-            <Settings size={20} />
-            Settings
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}

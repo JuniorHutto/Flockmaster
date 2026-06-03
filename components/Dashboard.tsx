@@ -41,6 +41,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
     { name: 'Wethers', value: stats.wethers },
   ].filter(d => d.value > 0);
 
+  const totalFlockWeight = useMemo(() => {
+    return activeSheep.reduce((acc, s) => {
+      if (s.weights.length === 0) return acc;
+      const recent = [...s.weights].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      return acc + recent.weight;
+    }, 0);
+  }, [activeSheep]);
+
   // Calculate average weight by gender (simple logic taking most recent weight)
   const weightData = useMemo(() => {
     const getAvg = (gender: Gender) => {
@@ -102,9 +110,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
             <Scale size={24} />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Avg Ram Wt</p>
+            <p className="text-sm text-gray-500">Total Flock Weight</p>
             <p className="text-2xl font-bold text-gray-800">
-               {weightData.find(d => d.name === 'Rams')?.weight || 0} lbs
+               {totalFlockWeight} lbs
             </p>
           </div>
         </div>
