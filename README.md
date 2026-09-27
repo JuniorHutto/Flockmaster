@@ -9,7 +9,8 @@ A comprehensive web application for managing sheep herds, tracking breeding reco
 - **Sheep Management**: Add, edit, view, and delete sheep records
 - **Sheep Listing**: Browse all sheep in your herd with search and filtering
 - **Task Management**: Track tasks related to herd management
-- **Data Storage**: Local storage for sheep data persistence
+- **Data Storage**: PostgreSQL via a small Node API, with offline browser cache
+- **Backup / Restore**: Export and import all data as a JSON file
 
 ### Planned Features
 - **Breeding Records**: Track breeding dates, sire information, and pregnancy checks
@@ -47,11 +48,18 @@ A comprehensive web application for managing sheep herds, tracking breeding reco
 
 ### Docker Deployment
 
-Build and run with Docker:
+Build and run the app, API and PostgreSQL database:
 ```bash
-docker build -t flockmaster .
-docker run -p 80:80 flockmaster
+docker compose up -d --build
 ```
+Open `http://localhost:81`. Data is stored in PostgreSQL (named volume `pgdata`), so it survives rebuilds.
+The browser keeps a local copy and syncs changes when the server is reachable (see the status in the sidebar).
+
+Optional: set `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_DB` in a `.env` file next to `docker-compose.yml`
+(defaults are `flockmaster`). Set them before the first start; the database keeps its original credentials afterwards.
+
+**Backup / restore:** use **Backup Data** / **Restore Data** in the sidebar for a JSON file backup.
+Do not run `docker compose down -v`: `-v` deletes the database volume.
 
 ## Project Structure
 

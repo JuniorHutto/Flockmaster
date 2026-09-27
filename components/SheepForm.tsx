@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Sheep, Gender, Status } from '../types';
+import { calculateDueDate, daysUntil, GESTATION_DAYS } from '../services/breedingUtils';
 import { Save, X } from 'lucide-react';
 
 interface SheepFormProps {
@@ -35,14 +36,6 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
       setFormData(initialData);
     }
   }, [initialData]);
-
-  // Calculate due date when breeding date changes (sheep gestation: 147 days)
-  const calculateDueDate = (breedingDate: string): string => {
-    if (!breedingDate) return '';
-    const date = new Date(breedingDate);
-    date.setDate(date.getDate() + 147);
-    return date.toISOString().split('T')[0];
-  };
 
   const handleBreedingDateChange = (date: string) => {
     const dueDate = calculateDueDate(date);
@@ -267,7 +260,7 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-pink-800 mb-2">Expected Due Date (147 days)</label>
+                  <label className="block text-sm font-medium text-pink-800 mb-2">Expected Due Date ({GESTATION_DAYS} days)</label>
                   <input 
                     type="date" 
                     className="w-full p-3 border border-pink-200 rounded-lg bg-pink-100 outline-none cursor-not-allowed"
@@ -277,7 +270,7 @@ export const SheepForm: React.FC<SheepFormProps> = ({ initialData, onSave, onCan
                   />
                   {formData.dueDate && (
                     <p className="text-xs text-pink-700 mt-1">
-                      {Math.ceil((new Date(formData.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
+                      {daysUntil(formData.dueDate)} days remaining
                     </p>
                   )}
                 </div>

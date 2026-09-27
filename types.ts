@@ -27,6 +27,7 @@ export interface BreedingRecord {
   date: string;
   sireId: string;
   sireName?: string;
+  dueDate?: string;
   pregnancyCheckDate?: string;
   isPregnant?: boolean;
   lambBornDate?: string;

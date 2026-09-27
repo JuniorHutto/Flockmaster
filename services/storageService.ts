@@ -1,4 +1,5 @@
 import { Sheep, Gender, Status, Task } from '../types';
+import { persist } from './syncService';
 
 const STORAGE_KEY = 'flockmaster_data_v1';
 const TASKS_STORAGE_KEY = 'flockmaster_tasks_v1';
@@ -91,7 +92,7 @@ export const getSheep = (): Sheep[] => {
   const data = localStorage.getItem(STORAGE_KEY);
   if (!data) {
     // Initialize with seed data if empty
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_DATA));
+    persist(STORAGE_KEY, SEED_DATA);
     return SEED_DATA;
   }
   const sheep = JSON.parse(data);
@@ -112,13 +113,13 @@ export const saveSheep = (sheep: Sheep): void => {
     allSheep.push(sheep);
   }
   
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(allSheep));
+  persist(STORAGE_KEY, allSheep);
 };
 
 export const deleteSheep = (id: string): void => {
   const allSheep = getSheep();
   const filtered = allSheep.filter(s => s.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  persist(STORAGE_KEY, filtered);
 };
 
 export const getSheepById = (id: string): Sheep | undefined => {
@@ -131,7 +132,7 @@ export const getSheepById = (id: string): Sheep | undefined => {
 export const getTasks = (): Task[] => {
   const data = localStorage.getItem(TASKS_STORAGE_KEY);
   if (!data) {
-    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(SEED_TASKS));
+    persist(TASKS_STORAGE_KEY, SEED_TASKS);
     return SEED_TASKS;
   }
   return JSON.parse(data);
@@ -146,17 +147,17 @@ export const saveTask = (task: Task): void => {
   } else {
     allTasks.push(task);
   }
-  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(allTasks));
+  persist(TASKS_STORAGE_KEY, allTasks);
 };
 
 export const deleteTask = (id: string): void => {
   const allTasks = getTasks();
   const filtered = allTasks.filter(t => t.id !== id);
-  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(filtered));
+  persist(TASKS_STORAGE_KEY, filtered);
 };
 
 export const deleteCompletedTasks = (): void => {
   const allTasks = getTasks();
   const activeTasks = allTasks.filter(t => t.status !== 'Completed');
-  localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(activeTasks));
+  persist(TASKS_STORAGE_KEY, activeTasks);
 };

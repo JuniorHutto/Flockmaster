@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { hydrateFromServer } from './services/syncService';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -8,8 +9,10 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
-root.render(
+
+// Load the latest data from the server before first render (falls back to browser data if offline)
+hydrateFromServer().finally(() => root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
-);
+));

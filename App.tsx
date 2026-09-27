@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ViewState, Sheep, HerdExpense, HerdRevenue } from './types';
 import { getSheep, saveSheep, deleteSheep, getSheepById } from './services/storageService';
 import { Dashboard } from './components/Dashboard';
@@ -7,7 +7,9 @@ import { SheepForm } from './components/SheepForm';
 import { SheepDetail } from './components/SheepDetail';
 import { TaskManager } from './components/TaskManager';
 import { ProfitabilityView } from './components/ProfitabilityView';
-import { LayoutGrid, List, Plus, CheckSquare, TrendingUp } from 'lucide-react';
+import { exportBackup, importBackup } from './services/backupService';
+import { getSyncStatus, subscribeSyncStatus, SyncStatus, persist } from './services/syncService';
+import { LayoutGrid, List, Plus, CheckSquare, TrendingUp, Download, Upload, Cloud, CloudOff, RefreshCw } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>({ view: 'DASHBOARD' });
@@ -15,14 +17,48 @@ const App: React.FC = () => {
   const [expenses, setExpenses] = useState<HerdExpense[]>([]);
   const [revenues, setRevenues] = useState<HerdRevenue[]>([]);
 
-  // Load data on mount
-  useEffect(() => {
+  const [backupMessage, setBackupMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [pendingRestore, setPendingRestore] = useState<File | null>(null);
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(getSyncStatus());
+
+  useEffect(() => subscribeSyncStatus(setSyncStatus), []);
+
+  const loadData = () => {
     setData(getSheep());
     const savedExpenses = localStorage.getItem('herdExpenses');
     const savedRevenues = localStorage.getItem('herdRevenues');
-    if (savedExpenses) setExpenses(JSON.parse(savedExpenses));
-    if (savedRevenues) setRevenues(JSON.parse(savedRevenues));
+    setExpenses(savedExpenses ? JSON.parse(savedExpenses) : []);
+    setRevenues(savedRevenues ? JSON.parse(savedRevenues) : []);
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    loadData();
   }, []);
+
+  const handleRestoreFileChosen = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) {
+      setBackupMessage(null);
+      setPendingRestore(file);
+    }
+  };
+
+  const handleConfirmRestore = async () => {
+    if (!pendingRestore) return;
+    try {
+      await importBackup(pendingRestore);
+      loadData();
+      setViewState({ view: 'DASHBOARD' });
+      setBackupMessage({ type: 'success', text: 'Backup restored.' });
+    } catch (err) {
+      setBackupMessage({ type: 'error', text: err instanceof Error ? err.message : 'Restore failed.' });
+    } finally {
+      setPendingRestore(null);
+    }
+  };
 
   const handleSaveSheep = (sheep: Sheep) => {
     saveSheep(sheep);
@@ -39,25 +75,25 @@ const App: React.FC = () => {
   const handleAddExpense = (expense: HerdExpense) => {
     const updated = [...expenses, expense];
     setExpenses(updated);
-    localStorage.setItem('herdExpenses', JSON.stringify(updated));
+    persist('herdExpenses', updated);
   };
 
   const handleAddRevenue = (revenue: HerdRevenue) => {
     const updated = [...revenues, revenue];
     setRevenues(updated);
-    localStorage.setItem('herdRevenues', JSON.stringify(updated));
+    persist('herdRevenues', updated);
   };
 
   const handleDeleteExpense = (id: string) => {
     const updated = expenses.filter(e => e.id !== id);
     setExpenses(updated);
-    localStorage.setItem('herdExpenses', JSON.stringify(updated));
+    persist('herdExpenses', updated);
   };
 
   const handleDeleteRevenue = (id: string) => {
     const updated = revenues.filter(r => r.id !== id);
     setRevenues(updated);
-    localStorage.setItem('herdRevenues', JSON.stringify(updated));
+    persist('herdRevenues', updated);
   };
 
   const renderContent = () => {
@@ -185,6 +221,68 @@ const App: React.FC = () => {
             Profitability
           </button>
         </nav>
+
+        <div className="p-4 border-t border-gray-100 space-y-2">
+          <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Data</p>
+          <div
+            className={`mx-2 px-2 flex items-center gap-2 text-sm
+              ${syncStatus === 'synced' ? 'text-emerald-700' : syncStatus === 'offline' ? 'text-amber-700' : 'text-gray-500'}`}
+            title={syncStatus === 'offline' ? 'Changes are saved in this browser and will upload when the server is reachable.' : undefined}
+          >
+            {syncStatus === 'synced' && <><Cloud size={16} /> Saved to database</>}
+            {syncStatus === 'syncing' && <><RefreshCw size={16} className="animate-spin" /> Saving...</>}
+            {syncStatus === 'offline' && <><CloudOff size={16} /> Server offline, saved locally</>}
+          </div>
+          <button
+            onClick={() => { setBackupMessage(null); exportBackup(); }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50"
+          >
+            <Download size={20} />
+            Backup Data
+          </button>
+          <button
+            onClick={() => restoreInputRef.current?.click()}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-50"
+          >
+            <Upload size={20} />
+            Restore Data
+          </button>
+          <input
+            ref={restoreInputRef}
+            type="file"
+            accept=".json,application/json"
+            className="hidden"
+            onChange={handleRestoreFileChosen}
+          />
+
+          {pendingRestore && (
+            <div className="mx-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm">
+              <p className="text-amber-800 mb-2">
+                Replace all current data with <span className="font-medium break-all">{pendingRestore.name}</span>?
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleConfirmRestore}
+                  className="flex-1 bg-amber-600 text-white px-3 py-1.5 rounded hover:bg-amber-700"
+                >
+                  Restore
+                </button>
+                <button
+                  onClick={() => setPendingRestore(null)}
+                  className="flex-1 bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {backupMessage && (
+            <p className={`mx-2 text-sm ${backupMessage.type === 'success' ? 'text-emerald-700' : 'text-red-600'}`}>
+              {backupMessage.text}
+            </p>
+          )}
+        </div>
 
       </aside>
 

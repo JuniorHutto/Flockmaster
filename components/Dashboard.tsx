@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Sheep, Gender, Status } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Users, Scale, Activity, TrendingUp } from 'lucide-react';
+import { daysUntil } from '../services/breedingUtils';
 
 interface DashboardProps {
   sheep: Sheep[];
@@ -143,7 +144,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ sheep }) => {
                   <p><span className="font-medium">Due:</span> {ewe.dueDate}</p>
                   {ewe.dueDate && (
                     <p className="font-semibold text-pink-700">
-                      {Math.ceil((new Date(ewe.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days left
+                      {daysUntil(ewe.dueDate)} days left
                     </p>
                   )}
                 </div>

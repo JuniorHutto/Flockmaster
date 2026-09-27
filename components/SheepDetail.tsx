@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sheep, WeightRecord, HealthRecord, Gender, HealthEventType, Status, BreedingRecord } from '../types';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { ArrowLeft, Edit2, Scale, Syringe, Save, Trash2, Calendar, Droplet, Activity, DollarSign, Heart } from 'lucide-react';
+import { calculateDueDate, daysUntil, GESTATION_DAYS } from '../services/breedingUtils';
 
 interface SheepDetailProps {
   sheep: Sheep;
@@ -56,7 +57,8 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
       id: Date.now().toString(),
       date: newBreedingDate,
       sireId: newBreedingSireId,
-      sireName: undefined
+      sireName: undefined,
+      dueDate: calculateDueDate(newBreedingDate)
     };
     const updated = { ...sheep, breedingRecords: [...(sheep.breedingRecords || []), breedingRec] };
     onUpdate(updated);
@@ -162,7 +164,7 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
                   <div>
                     <p className="text-xs text-pink-700 mb-1">Days Until Due</p>
                     <p className="font-bold text-pink-600">
-                      {sheep.dueDate ? Math.ceil((new Date(sheep.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 'N/A'}
+                      {sheep.dueDate ? daysUntil(sheep.dueDate) : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -391,6 +393,11 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
                 <Save size={18} />
               </button>
             </div>
+            {newBreedingDate && (
+              <p className="text-xs text-gray-500 mt-2">
+                Expected due date: <span className="font-semibold text-pink-700">{calculateDueDate(newBreedingDate)}</span> ({GESTATION_DAYS}-day gestation)
+              </p>
+            )}
           </div>
 
           <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -407,6 +414,20 @@ export const SheepDetail: React.FC<SheepDetailProps> = ({ sheep, onBack, onEdit,
                       <div>
                         <p className="font-semibold text-gray-800">Sire: {record.sireName || record.sireId}</p>
                         <p className="text-sm text-gray-600">Breeding Date: {record.date}</p>
+                        {(() => {
+                          if (record.lambBornDate || record.isPregnant === false) return null;
+                          const due = record.dueDate || calculateDueDate(record.date);
+                          if (!due) return null;
+                          const days = daysUntil(due);
+                          return (
+                            <p className="text-sm text-pink-700 font-medium">
+                              Due Date: {due}{' '}
+                              <span className="text-gray-500 font-normal">
+                                ({days > 0 ? `${days} days left` : days === 0 ? 'due today' : `${-days} days overdue`})
+                              </span>
+                            </p>
+                          );
+                        })()}
                         {record.pregnancyCheckDate && (
                           <>
                             <p className="text-sm text-gray-600">Pregnancy Check: {record.pregnancyCheckDate}</p>
